@@ -1,0 +1,46 @@
+#add-new-dialog, #edit-item-dialog{
+	display: none;
+}
+
+.input-text{
+	width: 270px;
+}
+
+input#add-item, input.save-settings{
+	float:right;
+	margin-top: 10px;
+}
+.child-admin-bar-item{
+	margin-left: 20px;
+}
+
+.ui-state-default{
+	height: 25px;
+}
+
+actions{
+	float: right;
+}
+.link:hover{
+	cursor: pointer;
+	color: Red;
+}
+.nav-tabs {
+	padding-top: 9px;
+}
+
+#menu-to-edit {
+	min-height:20px;
+}
+
+.nav-menus-php {
+	padding-top: 10px;
+}
+
+.ui-widget-overlay {
+    position: fixed !important;
+}
+
+#add-custom-field-button {
+	margin-top:20px;
+}
