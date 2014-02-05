@@ -67,7 +67,6 @@ class Theme_Updater_Admin_Object extends Runway_Admin_Object {
 				'/http(s)?:\/\/github.com\/(?<username>[\w-]+)\/(?<repo>[\w-]+)$/',
 				$theme['Github Theme URI'],
 				$matches);
-		
 			if(!isset($matches['username']) or !isset($matches['repo'])){
 
 				$data->response[$theme_key]['error'] = 'Incorrect github project url.  Format should be (no trailing slash): <code style="background:#FFFBE4;">https://github.com/&lt;username&gt;/&lt;repo&gt;</code>';
@@ -76,18 +75,19 @@ class Theme_Updater_Admin_Object extends Runway_Admin_Object {
 			}
 			//$url = sprintf('https://api.github.com/repos/%s/%s/tags', urlencode($matches['username']), urlencode($matches['repo']));
 			$url = sprintf('https://api.github.com/repos/%s/%s/tags', urlencode($matches['username']), urlencode($matches['repo']));
-			
 			$response = get_transient(md5($url)); // Note: WP transients fail if key is long than 45 characters
 
 			if(empty($response)){
-				$raw_response = wp_remote_get($url.'?client_id=32f8d23c218dc0f96e03&client_secret=f5d8b08a732576490b10733aed874941e5c356da', array('sslverify' => false, 'timeout' => 10));
+				//$raw_response = wp_remote_get($url.'?client_id=32f8d23c218dc0f96e03&client_secret=f5d8b08a732576490b10733aed874941e5c356da', array('sslverify' => false, 'timeout' => 10));
+				$raw_response = wp_remote_get($url.'?client_id=b8abf38417bea7b6a2ee&client_secret=d697637ba79e1b055dadd4f5dd404fe147e85add', array('sslverify' => false, 'timeout' => 10));
+out($raw_response);
 				if ( is_wp_error( $raw_response ) ){
 					$data->response[$theme_key]['error'] = "Error response from " . $url;
 					$this->theme_update_notise = "Error response from " . $url;
 					continue;
 				}
 				$response = json_decode($raw_response['body']);
-
+out($response);
 				if(isset($response->message)){
 					if(is_array($response->message)){
 						$errors = '';
