@@ -36,13 +36,16 @@ class Theme_Updater_Admin_Object extends Runway_Admin_Object {
 			$dir_dt = FRAMEWORK_DIR.'data-types';
 			$dir_fw = FRAMEWORK_DIR.'framework';
 			$dir_ext = FRAMEWORK_DIR.'extensions';
+			$dir_data = FRAMEWORK_DIR.'data';
 
 			$wp_filesystem->mkdir($dir_dt, FS_CHMOD_DIR);
 			$wp_filesystem->mkdir($dir_fw, FS_CHMOD_DIR);
 			$wp_filesystem->mkdir($dir_ext, FS_CHMOD_DIR);
+			$wp_filesystem->mkdir($dir_data, FS_CHMOD_DIR);
 
-			copy_dir(FRAMEWORK_DIR.'runway-framework', FRAMEWORK_DIR, array('extensions'));
+			copy_dir(FRAMEWORK_DIR.'runway-framework', FRAMEWORK_DIR, array('extensions', 'data'));
 			copy_dir($dir.'extensions', $dir_ext);
+			copy_dir($dir.'data', $dir_ext);
 
 			$wp_filesystem->delete($dir, true);
 			$wp_filesystem->delete(FRAMEWORK_DIR.'runway-framework', true);
@@ -193,9 +196,14 @@ class Theme_Updater_Admin_Object extends Runway_Admin_Object {
 		$dst = str_replace('runway-framework', 'runway-framework-tmp', FRAMEWORK_DIR);
 		if (!is_dir($dst)) {
 		    $wp_filesystem->mkdir($dst, FS_CHMOD_DIR);
+		    
 		    $wp_filesystem->mkdir($dst.'extensions', FS_CHMOD_DIR);
 		 	$src = FRAMEWORK_DIR.'extensions';
 		 	copy_dir($src, $dst.'extensions');
+
+		    $wp_filesystem->mkdir($dst.'data', FS_CHMOD_DIR);
+		 	$src = FRAMEWORK_DIR.'data';
+		 	copy_dir($src, $dst.'data');		 	
 		}
 			
 		$upgrader->skin->feedback(__("Executing upgrader_source_selection_filter function...", 'framework'));
