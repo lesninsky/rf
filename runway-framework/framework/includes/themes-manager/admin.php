@@ -1,12 +1,12 @@
 	<?php
 
 global $developer_tools, $Themes_Manager, $extm;
-$extensions_dir = TEMPLATEPATH . '/framework/extensions/';
+$extensions_dir = get_template_directory() . '/framework/extensions/';
 
-$required = '<em class="required">' . __( 'Required', THEME_NAME ) . '</em>';
+$required = '<em class="required">' . __( 'Required', 'framework' ) . '</em>';
 $_data = $developer_tools->data;
 
-$themes_path = explode( '/', TEMPLATEPATH );
+$themes_path = explode( '/', get_template_directory() );
 unset( $themes_path[count( $themes_path ) - 1] );
 $themes_path = implode( '/', $themes_path );
 
@@ -70,7 +70,7 @@ case 'edit-theme': {
 			$errors = $developer_tools->validate_theme_settings( $post );
 			if ( count( $errors ) ) {
 				$options = $post;
-				$this->view( 'theme-conf' );
+				$this->view( 'theme-conf', false, array('errors'=>$errors) );
 			} else {
 				$options = $developer_tools->build_and_save_theme( $post, false );
 

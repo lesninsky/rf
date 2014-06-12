@@ -17,7 +17,7 @@ $ts      = time();
 
 // Get most recent package (or create it)
 if (!count($history) || $action == 'rebuild') {
-	// No packages exist or user requested new build
+	// No packages exist or user requested new build 
 	$alone_package_download_url = $developer_tools->build_alone_theme( $nameKey, $ts );
 	$child_package_download_url = $developer_tools->build_child_package( $nameKey, $ts );
 	$most_recent = $developer_tools->make_package_info_from_ts( $nameKey, $ts );
@@ -29,7 +29,7 @@ if (!count($history) || $action == 'rebuild') {
 
 	// Display success message
 	if ($alone_package_download_url && $child_package_download_url && $most_recent)
-		echo '<div id="message" class="updated below-h2"><p>New download package created.</p></div>';
+		echo '<div id="message" class="updated below-h2"><p>'. __('New download package created', 'framework').'.</p></div>';
 } else {
 	// Use most recent package from history
 	$most_recent = array_shift($history);
@@ -44,7 +44,8 @@ $developer_tools->navigation_bar( array('Download'.$navName) );
 // -----------------------------------------
  
 $current_package = $most_recent;
-
+$current_data = json_decode( $developer_tools->get_package_tags( $current_package['exp'] ) );
+$current_tag = ($current_data && $current_data->tags_show == "true" )? $current_data->tags_edit : '';
 ?>
 <h3><?php _e('Most Recent', 'framework') ?></h3>
 
@@ -54,6 +55,7 @@ $current_package = $most_recent;
 			<th><?php _e('Date', 'framework') ?></th>
 			<th><?php _e('Standalone Theme', 'framework') ?></th>
 			<th><?php _e('Child Theme', 'framework') ?></th>
+			<th><?php _e('Tags', 'framework') ?></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -64,7 +66,7 @@ $current_package = $most_recent;
 if ( $current_package['a_hash'] ) { 
 	?>
 
-				<p><a href="<?php echo get_bloginfo( 'url' ) . '/wp-content/themes/' . $_REQUEST['name'] . '/download/' . $current_package['a_file']?>" class="button-primary"><?php _e('Download', 'framework') ?></a></p>
+				<p><a href="<?php echo home_url() . '/wp-content/themes/' . $_REQUEST['name'] . '/download/' . $current_package['a_file']?>" class="button-primary"><?php _e('Download', 'framework') ?></a></p>
 				<p class="checksum"><?php echo __('Checksum', 'framework') .": <span class='code'>". $current_package['a_hash']; ?></span></p>
 				<?php 
 			} 
@@ -76,11 +78,14 @@ else {
 			<td>
 <?php 
 if ( $current_package['c_hash'] ) { ?>
-				<p><a href="<?php echo get_bloginfo( 'url' ) . '/wp-content/themes/' . $_REQUEST['name'] . '/download/' . $current_package['c_file']?>" class="button-primary"><?php _e('Download', 'framework') ?></a></p>
+				<p><a href="<?php echo home_url() . '/wp-content/themes/' . $_REQUEST['name'] . '/download/' . $current_package['c_file']?>" class="button-primary"><?php _e('Download', 'framework') ?></a></p>
 				<p class="checksum"><?php echo __('Checksum', 'framework') .": <span class='code'>". $current_package['c_hash']; ?></span></p>
 <?php 
 } 
 else { ?>Not found<?php } ?>
+			</td>
+			<td>
+				<?php echo $current_tag; ?>
 			</td>
 		</tr>
 	</tbody>
@@ -90,6 +95,7 @@ else { ?>Not found<?php } ?>
 			<th><?php _e('Date', 'framework') ?></th>
 			<th><?php _e('Standalone Theme', 'framework') ?></th>
 			<th><?php _e('Child Theme', 'framework') ?></th>
+			<th><?php _e('Tags', 'framework') ?></th>
 		</tr>
 	</tfoot>
 </table>
@@ -97,7 +103,7 @@ else { ?>Not found<?php } ?>
 
 <?php
 // Rebuild package button
-$rebuild_button = $html->settings_link('Rebuild Download Packages', array('class'=>'button-primary rebuild-package','action'=>'rebuild','navigation'=>'do-package','name'=>$nameKey));
+$rebuild_button = $html->settings_link(__('Rebuild Download Packages', 'framework'), array('class'=>'button-primary rebuild-package','action'=>'rebuild','navigation'=>'do-package','name'=>$nameKey));
 ?>
 
 <p><?php echo $rebuild_button; ?></p>
@@ -105,8 +111,8 @@ $rebuild_button = $html->settings_link('Rebuild Download Packages', array('class
 <div class="tags-dialog">
 	<fieldset>
 	    <input type="checkbox" name="tags-show" id="tags-show" class="input-check custom-data-type">
-	    <label for="tags-show">Show in the package history</label><br><br>
-	    <label for="tags-edit">Tags</label><br>
+	    <label for="tags-show"><?php echo __('Show in the package history', 'framework'); ?></label><br><br>
+	    <label for="tags-edit"><?php echo __('Tags', 'framework'); ?></label><br>
 		<textarea id="tags-edit" name="tags-edit" class="settings-textarea" cols=40 rows=5></textarea>
 	    <input type="hidden" id="package-id" value='' >
 	</fieldset>
@@ -123,7 +129,7 @@ if ( $history ) { ?>
 
 	<br>
 	<h3><?php _e('History', 'framework') ?></h3>
-
+	
 	<table class="widefat">
 		<thead>
 			<tr>
@@ -162,7 +168,7 @@ if ( $history ) { ?>
 					<td>
 				<?php 
 				if ( $package['a_hash'] ) { ?>
-						<p><a href="<?php echo get_bloginfo( 'url' ) . '/wp-content/themes/' . $_REQUEST['name'] . '/download/' . $package['a_file']?>"><?php _e('Download', 'framework') ?></a> &nbsp;(<span class="code"><?php echo $package['a_hash']; ?></span>)</p>
+						<p><a href="<?php echo home_url() . '/wp-content/themes/' . $_REQUEST['name'] . '/download/' . $package['a_file']?>"><?php _e('Download', 'framework') ?></a> &nbsp;(<span class="code"><?php echo $package['a_hash']; ?></span>)</p>
 						<?php 
 				} else { 
 					_e('Package Not Found', 'framework');
@@ -171,14 +177,14 @@ if ( $history ) { ?>
 					<td>
 				<?php 
 				if ( $package['c_hash'] ) { ?>
-						<p><a href="<?php echo get_bloginfo( 'url' ) . '/wp-content/themes/' . $_REQUEST['name'] . '/download/' . $package['c_file']?>"><?php _e('Download', 'framework') ?></a> &nbsp;(<span class="code"><?php echo $package['c_hash']; ?></span>)</p>
+						<p><a href="<?php echo home_url() . '/wp-content/themes/' . $_REQUEST['name'] . '/download/' . $package['c_file']?>"><?php _e('Download', 'framework') ?></a> &nbsp;(<span class="code"><?php echo $package['c_hash']; ?></span>)</p>
 				<?php 
 				} else { 
 					_e('Package Not Found', 'framework');
 				} ?>
 					</td>
 					<td>
-						<p><?php echo $tag; ?></p>
+						<p><?php echo $tag;?></p>
 					</td>
 					<td>
 						<p><a href="<?php echo $developer_tools->self_url('edit-tags-package').'&name='.$_REQUEST['name'].'&package='.$package['exp']; ?>" class="link-tags-edit"><?php _e('Edit', 'framework'); ?></a></p>
