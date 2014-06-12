@@ -53,7 +53,12 @@ if ( runway_php_version(true) >= 50301 ) {
 	// Load translations for javascript
 	//-----------------------------------------------------------------
 	include_once 'translations-js.php';
+//	load_theme_textdomain('framework', get_template_directory() . '/languages');
 
+// $a = 'Logo';
+// //echo "==".__('Logo', 'framework');
+// echo "==".rf__($a);  echo "<hr>"  ;
+// echo "++"; rf_e($a);    echo "<hr>"  ;
 
 	//-----------------------------------------------------------------
 	// Initialize the admin components

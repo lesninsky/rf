@@ -9,6 +9,7 @@ class Directory_Admin extends Runway_Admin_Object {
 		$upload_dir = wp_upload_dir( );
 		$this->downloads_dir = $upload_dir['basedir'].'/download_dir/';
 		$this->extensions_server_url = 'http://runwaywp.com/sites/main/wp-admin/admin-ajax.php?action=';
+		$this->extensions_server_url1 = 'http://wptest.loc/wp-admin/admin-ajax.php?action=';
 
 		add_action( 'init', array( $this, 'init' ) );
 	}
@@ -19,6 +20,21 @@ class Directory_Admin extends Runway_Admin_Object {
 			//$Directory_Admin->navigation = $_REQUEST['navigation'];
 			$this->navigation = $_REQUEST['navigation'];
 		}
+
+		$postdata = array(
+			'token' => 'f7804479f02be6350dbf5ebd0fbbaba8',
+			'user' => wp_get_current_user(),
+		);
+
+		$post_args = array(
+			'method' => 'POST',
+			'timeout' => 10,
+			'body' => $postdata
+		    );
+
+ 		$response_json = wp_remote_post($this->extensions_server_url1.'sync_downloads', $post_args);
+ //out($response_json);
+
 	}
 
 	function validate_sumbission() {

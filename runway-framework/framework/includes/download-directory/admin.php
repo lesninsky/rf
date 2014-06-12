@@ -45,7 +45,8 @@ default: {
 			$response->on_page = 1;
 		}
 
-		include_once 'views/browse.php';
+//		include_once 'views/browse.php';
+		include_once 'views/downloads.php';
 
 	} break;
 }
