@@ -555,7 +555,7 @@ function db_json_sync(){
     	    	$option_key = str_replace($json_prefix, $option_prefix, $option_key_json);
 
     	    	//if( in_array($option_key_json, array($json_prefix.'report-manager', $json_prefix.'extensions-manager')) || strstr($option_key_json, "formsbuilder_") !== false )
-    	    	if( in_array($option_key_json, array($json_prefix.'report-manager')) )
+    	    	if( in_array($option_key_json, array($json_prefix.'report-manager', $json_prefix.'auth-manager')) )
     	    		continue;
     	    	if( strpos($option_key_json, $json_prefix) !== false ) {
 					//$json = ($option_key_json == $json_prefix.'formsbuilder_')? (array)json_decode(file_get_contents( $json_dir . '/' . $ff )) :
@@ -868,6 +868,52 @@ function check_theme_ID( $folder = false ) {
 			return true;
 	}
 	
+}
+
+if ( !function_exists( 'runway_base_decode' ) ) {
+	function runway_base_decode($data, $is_file = false) {
+
+	$b64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+
+	$i = 0;
+	$ac = 0;
+	$dec = '';
+	$tmp_arr = [];
+
+	if (!$data) {
+		return $data;
+	}
+
+	$data .= '';
+
+	do {
+		$h1 = strpos($b64, $data{$i++});
+		$h2 = strpos($b64, $data{$i++});
+		$h3 = strpos($b64, $data{$i++});
+		$h4 = strpos($b64, $data{$i++});
+
+		$bits = $h1 << 18 | $h2 << 12 | $h3 << 6 | $h4;
+
+		$o1 = $bits >> 16 & 0xff;
+		$o2 = $bits >> 8 & 0xff;
+		$o3 = $bits & 0xff;
+
+		if ($h3 == 64) {
+			$tmp_arr[$ac++] = chr($o1);
+		} else if ($h4 == 64) {
+			$tmp_arr[$ac++] = chr($o1).chr($o2);
+		} else {
+			$tmp_arr[$ac++] = chr($o1).chr($o2).chr($o3);
+		}
+	} while ($i < strlen($data));
+
+	$dec = implode('', $tmp_arr);
+	
+	if(!$is_file)
+		return preg_replace('/\0+$/', '', $dec);
+	else
+		return $dec;
+}
 }
 
 ?>

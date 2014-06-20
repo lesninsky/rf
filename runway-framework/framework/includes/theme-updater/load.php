@@ -22,7 +22,7 @@ $settings = array(
 	'default' => $default,
 	'parent_menu' => 'settings',
 	'wp_containers' => 'none',
-	'interval' => 10, //60*60*24,  /// update interval (24 hours)
+	'interval' => 60*60*24,  /// update interval (24 hours)
 	'file' => __FILE__,
 );
 

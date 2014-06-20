@@ -9,9 +9,13 @@ class Directory_Admin extends Runway_Admin_Object {
 		$upload_dir = wp_upload_dir( );
 		$this->downloads_dir = $upload_dir['basedir'].'/download_dir/';
 		$this->extensions_server_url = 'http://runwaywp.com/sites/main/wp-admin/admin-ajax.php?action=';
-		$this->extensions_server_url1 = 'http://wptest.loc/wp-admin/admin-ajax.php?action=';
+		$this->extensions_server_url = 'http://wptest.loc/wp-admin/admin-ajax.php?action=';
 
 		add_action( 'init', array( $this, 'init' ) );
+		add_action( 'wp_ajax_get_extensions', array( &$this, 'get_extensions' ) );
+		add_action( 'wp_ajax_nopriv_get_extensions', array( &$this, 'get_extensions' ) );
+		add_action( 'wp_ajax_download_extension', array( &$this, 'download_extension' ) );
+		add_action( 'wp_ajax_nopriv_download_extension', array( &$this, 'download_extension' ) );
 	}
 
 	function init() {
@@ -20,21 +24,6 @@ class Directory_Admin extends Runway_Admin_Object {
 			//$Directory_Admin->navigation = $_REQUEST['navigation'];
 			$this->navigation = $_REQUEST['navigation'];
 		}
-
-		$postdata = array(
-			'token' => 'f7804479f02be6350dbf5ebd0fbbaba8',
-			'user' => wp_get_current_user(),
-		);
-
-		$post_args = array(
-			'method' => 'POST',
-			'timeout' => 10,
-			'body' => $postdata
-		    );
-
- 		$response_json = wp_remote_post($this->extensions_server_url1.'sync_downloads', $post_args);
- //out($response_json);
-
 	}
 
 	function validate_sumbission() {
@@ -60,7 +49,8 @@ class Directory_Admin extends Runway_Admin_Object {
 		$responce = json_decode( $wp_filesystem->get_contents( $url, false ) );
 
 		if ( isset( $responce->hash ) && $responce->hash == md5( $responce->data ) ) {
-			return json_decode( base64_decode( $responce->data ) );
+			//return json_decode( base64_decode( $responce->data ) );
+			return json_decode( runway_base_decode( $responce->data ) );
 		} else {
 			return false;
 		}
@@ -73,5 +63,73 @@ class Directory_Admin extends Runway_Admin_Object {
 
 	}
 
+	function build_extensions_list() {
+		global $settingshortname;
+
+		$this->option_key = $settingshortname.'extensions-server';		
+		$this->server_extensions = get_option( $this->option_key );
+
+		return $this->server_extensions;
+
+	}
+
+	function download_extension() {
+
+		extract( $_REQUEST );
+
+		if ( isset( $item ) ) {
+	//			$extension_file_name = "{$this->downloads_dir}{$item}.zip";
+			$extension_file_name = $_REQUEST['zip']."/{$item}.zip";
+			if ( file_exists( $extension_file_name ) ) {							
+				if(!function_exists('WP_Filesystem'))
+					require_once(ABSPATH . 'wp-admin/includes/file.php');
+				WP_Filesystem();
+				global $wp_filesystem;
+				$content = $wp_filesystem->get_contents($extension_file_name);
+				$content = base64_encode($content);
+				echo $content;
+			}
+		}
+
+		die();
+	}
+
+	function get_extensions() {
+
+		extract( $_REQUEST );
+
+		$extensions = $this->build_extensions_list();
+
+		if ( isset( $search ) && !empty( $search ) ) {
+			$search_keys = array( 'Name', 'Description', 'Author', 'Title', 'AuthorName' );
+			$search_results = array();
+
+			foreach ( $extensions as $slug => $extension ) {
+				foreach ( $extension as $key => $option ) {
+					if ( in_array( $key, $search_keys ) ) {
+						if ( strstr( strtolower( $option ), strtolower( $search ) ) != false ) {
+							$search_results[$slug] = $extension;
+						}
+					}
+				}
+			}
+
+			$extensions = $search_results;
+		}
+
+		$on_page = 20;
+
+		if ( !isset( $page ) && empty( $page ) ) { 
+			$page = 0; 
+		}
+		$total = count( $extensions );
+
+		$extensions = array_slice( $extensions, $page * $on_page, $on_page );
+
+		echo json_encode( array( 'page' => $page, 'total_count' => $total, 'on_page' => $on_page, 'extensions' => $extensions ) );
+
+		exit();
+
+	}
 }
 ?>
